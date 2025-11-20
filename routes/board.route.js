@@ -4,6 +4,7 @@ import {
   deleteBoard,
   getBoardById,
   getBoards,
+  inviteMember,
   updateBoard,
 } from "../controllers/board.controller.js";
 import { authMiddleware } from "../middlewares/auth.middleware.js";
@@ -35,5 +36,12 @@ router.delete(
   checkBoardAccess("owner"),
   deleteBoard
 );
+
+router.post(
+  "/boards/:id/members",
+  authMiddleware,
+  checkBoardAccess("owner"),
+  inviteMember
+)
 
 export default router;

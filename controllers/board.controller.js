@@ -1,4 +1,5 @@
 import Board from "../models/board.model.js";
+import User from "../models/user.model.js";
 
 export const createBoard = async (req, res) => {
   try {
@@ -117,6 +118,40 @@ export const deleteBoard = async (req, res) => {
 
     return res.status(200).json({
       message: "Board deleted successfully",
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Server Error", error: error.message });
+  }
+};
+
+export const inviteMember = async (req, res) => {
+  const board = req.board;
+  const { email } = req.body;
+
+  try {
+    const existingUser = await User.findOne({ email });
+    if (!existingUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const isAlreadyMember = board.members.some(
+      (member) => member.user.toString() === existingUser._id.toString()
+    );
+
+    if (isAlreadyMember) {
+      return res
+        .status(400)
+        .json({ message: "User is already a member of the board" });
+    }
+
+    board.members.push({ user: existingUser._id, role: "member" });
+    await board.save();
+
+    return res.status(200).json({
+      message: "Member invited successfully",
+      board,
     });
   } catch (error) {
     return res
