@@ -27,8 +27,8 @@ const boardSchema = new mongoose.Schema(
         },
         role: {
           type: String,
-          enum: ["owner", "editor", "viewer"],
-          default: "editor",
+          enum: ["owner", "member"],
+          default: "member",
         },
       },
     ],
