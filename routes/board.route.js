@@ -1,0 +1,15 @@
+import express from "express";
+import { createBoard, getBoardById, getBoards, updateBoard } from "../controllers/board.controller.js";
+import { authMiddleware } from "../middlewares/auth.middleware.js";
+
+const router = express.Router();
+
+router
+  .post("/boards", authMiddleware, createBoard)
+  .get("/boards", authMiddleware, getBoards);
+
+router.get("/boards/:id", authMiddleware, getBoardById);
+
+router.put("/updateBoard/:id", authMiddleware, updateBoard);
+
+export default router;
