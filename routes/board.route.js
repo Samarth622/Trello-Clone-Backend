@@ -1,5 +1,5 @@
 import express from "express";
-import { createBoard, getBoardById, getBoards, updateBoard } from "../controllers/board.controller.js";
+import { createBoard, deleteBoard, getBoardById, getBoards, updateBoard } from "../controllers/board.controller.js";
 import { authMiddleware } from "../middlewares/auth.middleware.js";
 
 const router = express.Router();
@@ -11,5 +11,7 @@ router
 router.get("/boards/:id", authMiddleware, getBoardById);
 
 router.put("/updateBoard/:id", authMiddleware, updateBoard);
+
+router.delete("/deleteBoard/:id", authMiddleware, deleteBoard);
 
 export default router;

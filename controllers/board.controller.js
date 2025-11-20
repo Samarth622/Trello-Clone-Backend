@@ -79,7 +79,6 @@ export const updateBoard = async (req, res) => {
   const { title, description, isPrivate } = req.body;
 
   try {
-
     const board = await Board.findOneAndUpdate(
       { _id: boardId, owner: userId },
       { title, description, isPrivate },
@@ -96,7 +95,29 @@ export const updateBoard = async (req, res) => {
       board,
       message: "Board updated successfully",
     });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Server Error", error: error.message });
+  }
+};
 
+export const deleteBoard = async (req, res) => {
+  const boardId = req.params.id;
+  const userId = req.user.id;
+
+  try {
+    const board = await Board.findOneAndDelete({ _id: boardId, owner: userId });
+
+    if (!board) {
+      return res
+        .status(404)
+        .json({ message: "Board not found or access denied" });
+    }
+
+    return res.status(200).json({
+      message: "Board deleted successfully",
+    });
   } catch (error) {
     return res
       .status(500)
