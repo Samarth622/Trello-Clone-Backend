@@ -22,20 +22,19 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-userSchema.pre("save", function (next) {
-  const password = this.password;
-  if (password && password.length < 6) {
+userSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) return next();
+
+  if (this.password.length < 6) {
     return next(new Error("Password must be at least 6 characters long."));
   }
 
-  if (this.isModified("password")) {
-    this.password = bcrypt.hashSync(password, 10);
-  }
+  this.password = await bcrypt.hash(this.password, 10);
   next();
 });
 
-userSchema.methods.comparePassword = function (candidatePassword) {
-  return bcrypt.compareSync(candidatePassword, this.password);
+userSchema.methods.comparePassword = async function (candidate) {
+  return await bcrypt.compare(candidate, this.password);
 };
 
 const User = mongoose.model("User", userSchema);

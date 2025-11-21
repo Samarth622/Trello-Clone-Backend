@@ -1,5 +1,8 @@
 import Board from "../models/board.model.js";
 import User from "../models/user.model.js";
+import mongoose from "mongoose";
+import List from "../models/list.model.js";
+import Card from "../models/card.model.js";
 
 export const createBoard = async (req, res) => {
   try {
@@ -48,20 +51,13 @@ export const getBoards = async (req, res) => {
 };
 
 export const getBoardById = async (req, res) => {
-  const boardId = req.params.id;
-  const userId = req.user.id;
-
   try {
-    const board = await Board.findOne({
-      _id: boardId,
-      $or: [{ owner: userId }, { "members.user": userId }],
-    }).select("title description owner members createdAt");
+    const board = req.board;
 
-    if (!board) {
-      return res
-        .status(404)
-        .json({ message: "Board not found or access denied" });
-    }
+    await Board.populate(board, [
+      { path: "owner", select: "name email" },
+      { path: "members.user", select: "name email" },
+    ]);
 
     return res.status(200).json({
       board,
@@ -107,19 +103,32 @@ export const deleteBoard = async (req, res) => {
   const boardId = req.params.id;
   const userId = req.user.id;
 
+  const session = await mongoose.startSession();
+  session.startTransaction();
   try {
-    const board = await Board.findOneAndDelete({ _id: boardId, owner: userId });
+    const board = await Board.findOneAndDelete(
+      { _id: boardId, owner: userId },
+      { session }
+    );
 
     if (!board) {
+      await session.abortTransaction();
+      session.endSession();
       return res
         .status(404)
         .json({ message: "Board not found or access denied" });
     }
 
-    return res.status(200).json({
-      message: "Board deleted successfully",
-    });
+    await List.deleteMany({ board: boardId }, { session });
+    await Card.deleteMany({ board: boardId }, { session });
+
+    await session.commitTransaction();
+    session.endSession();
+
+    return res.status(200).json({ message: "Board deleted successfully" });
   } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
     return res
       .status(500)
       .json({ message: "Server Error", error: error.message });

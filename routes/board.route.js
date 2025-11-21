@@ -12,36 +12,13 @@ import { checkBoardAccess } from "../middlewares/checkBoardAccess.js";
 
 const router = express.Router();
 
-router
-  .post("/boards", authMiddleware, createBoard)
-  .get("/boards", authMiddleware, getBoards);
+router.post("/boards", authMiddleware, createBoard);
+router.get("/boards", authMiddleware, getBoards);
 
-router.get(
-  "/boards/:id",
-  authMiddleware,
-  checkBoardAccess("member"),
-  getBoardById
-);
+router.get("/boards/:id", authMiddleware, checkBoardAccess("member"), getBoardById);
+router.put("/boards/:id", authMiddleware, checkBoardAccess("owner"), updateBoard);
+router.delete("/boards/:id", authMiddleware, checkBoardAccess("owner"), deleteBoard);
 
-router.put(
-  "/updateBoard/:id",
-  authMiddleware,
-  checkBoardAccess("owner"),
-  updateBoard
-);
-
-router.delete(
-  "/deleteBoard/:id",
-  authMiddleware,
-  checkBoardAccess("owner"),
-  deleteBoard
-);
-
-router.post(
-  "/boards/:id/members",
-  authMiddleware,
-  checkBoardAccess("owner"),
-  inviteMember
-)
+router.post("/boards/:id/members", authMiddleware, checkBoardAccess("owner"), inviteMember);
 
 export default router;

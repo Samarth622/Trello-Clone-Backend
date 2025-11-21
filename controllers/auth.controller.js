@@ -20,6 +20,7 @@ export const register = async (req, res) => {
       message: "User registered successfully.",
       userId: newUser._id,
       email: newUser.email,
+      name: newUser.name,
     });
   } catch (error) {
     return res

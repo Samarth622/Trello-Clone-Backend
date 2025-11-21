@@ -11,9 +11,9 @@ import {
 const router = express.Router();
 
 router
-  .post("/list/:id", authMiddleware, checkBoardAccess("member"), createList)
+  .post("/boards/:id/lists", authMiddleware, checkBoardAccess("member"), createList)
   .get(
-    "/lists/:id",
+    "/boards/:id/lists",
     authMiddleware,
     checkBoardAccess("member"),
     getListsByBoard
@@ -21,13 +21,13 @@ router
 
 router
   .put(
-    "/list/:id/:listId",
+    "/:id/lists/:listId",
     authMiddleware,
     checkBoardAccess("member"),
     updateList
   )
   .delete(
-    "/list/:id/:listId",
+    "/:id/lists/:listId",
     authMiddleware,
     checkBoardAccess("member"),
     deleteList

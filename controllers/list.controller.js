@@ -1,16 +1,22 @@
 import List from "../models/list.model.js";
+import Card from "../models/card.model.js";
 
 export const createList = async (req, res) => {
   const board = req.board;
   const { title } = req.body;
 
   try {
+    if (!title || title.trim() === "") {
+      return res.status(400).json({ message: "List title is required" });
+    }
+
     const lastList = await List.find({ board: board._id })
       .sort({ position: -1 })
       .limit(1)
       .select("position");
 
-    const nextPosition = lastList.length === 0 ? 1 : lastList[0].position + 1;
+    const nextPosition =
+      lastList.length === 0 ? 1 : lastList[0].position + 1;
 
     const newList = await List.create({
       title,

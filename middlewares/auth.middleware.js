@@ -13,6 +13,9 @@ export const authMiddleware = (req, res, next) => {
 
   try {
     const decoded = verifyToken(token);
+    if (!decoded || !decoded.id) {
+      return res.status(401).json({ message: "Invalid token payload" });
+    }
     req.user = decoded;
     next();
   } catch (error) {
