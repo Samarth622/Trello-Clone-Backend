@@ -124,7 +124,14 @@ async function computeRelatedGroups(boardId, cards, similarityThreshold = 0.25) 
         }
       }
       const avgScore = pairs === 0 ? 0 : totalScore / pairs;
-      groups.push({ cardIds: comp, score: avgScore, reason: `Textual similarity (avg=${avgScore.toFixed(2)})` });
+      groups.push({
+  cards: comp.map((id) => ({
+    id,
+    title: cards.find((c) => c._id.toString() === id)?.title || "Untitled"
+  })),
+  score: avgScore,
+  reason: `Textual similarity (avg=${avgScore.toFixed(2)})`,
+});
     }
   }
 
@@ -133,8 +140,8 @@ async function computeRelatedGroups(boardId, cards, similarityThreshold = 0.25) 
 
 export async function computeRecommendationsForBoard(boardId) {
   const cards = await Card.find({ board: boardId }).lean();
-
   const lists = await List.find({ board: boardId }).lean();
+
   const listNameToId = {};
   for (const l of lists) {
     if (!l || !l.title) continue;
@@ -150,11 +157,14 @@ export async function computeRecommendationsForBoard(boardId) {
     const text = `${card.title || ""} ${card.description || ""}`;
     const score = computeDueScore(text);
     const days = scoreToDays(score);
+
     if (days !== null) {
       const suggestedDate = new Date(today);
       suggestedDate.setDate(suggestedDate.getDate() + days);
+
       dueDateSuggestions.push({
         cardId: card._id.toString(),
+        cardTitle: card.title,               // ⭐ Added
         suggestedDue: suggestedDate.toISOString(),
         score,
         confidence: Math.min(0.95, 0.2 + score * 0.1),
@@ -163,10 +173,14 @@ export async function computeRecommendationsForBoard(boardId) {
     }
 
     const move = computeMoveSuggestion(text);
+
     if (move) {
-      const targetListId = listNameToId[move.suggestedListName.toLowerCase()];
+      const targetListId =
+        listNameToId[move.suggestedListName.toLowerCase()];
+
       moveSuggestions.push({
         cardId: card._id.toString(),
+        cardTitle: card.title,              // ⭐ Added
         suggestedListName: move.suggestedListName,
         suggestedListId: targetListId || null,
         confidence: move.confidence,

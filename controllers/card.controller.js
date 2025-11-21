@@ -3,7 +3,7 @@ import Card from "../models/card.model.js";
 
 export const createCard = async (req, res) => {
   const listId = req.params.listId;
-  const { title, description, dueDate, labels, priority } = req.body;
+  const { title, description, priority } = req.body;
 
   try {
     if (!title || title.trim() === "") {
@@ -31,8 +31,8 @@ export const createCard = async (req, res) => {
       board: list.board,
       list: listId,
       position: nextPosition,
-      dueDate: dueDate || null,
-      labels: labels || [],
+      dueDate:  null,
+      labels: [],
       priority: priority || "medium",
       assignees: [],
     });

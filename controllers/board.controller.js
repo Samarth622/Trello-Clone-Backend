@@ -36,6 +36,7 @@ export const getBoards = async (req, res) => {
       $or: [{ owner: userId }, { "members.user": userId }],
     })
       .select("title description owner members createdAt")
+      .populate("owner", "name email") // ⭐ Add this
       .sort({ createdAt: -1 });
 
     return res.status(200).json({
