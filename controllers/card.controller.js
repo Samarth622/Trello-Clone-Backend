@@ -65,7 +65,15 @@ export const getCardsByBoard = async (req, res) => {
 
 export const updateCard = async (req, res) => {
   const { cardId } = req.params;
-  const { title, description, labels, priority, dueDate } = req.body;
+  const {
+    title,
+    description,
+    labels,
+    priority,
+    dueDate,
+    assignees,
+    metaData
+  } = req.body;
 
   try {
     const card = await Card.findById(cardId);
@@ -83,6 +91,8 @@ export const updateCard = async (req, res) => {
     if (labels !== undefined) card.labels = labels;
     if (priority !== undefined) card.priority = priority;
     if (dueDate !== undefined) card.dueDate = dueDate;
+    if (assignees !== undefined) card.assignees = assignees;
+    if (metaData !== undefined) card.metaData = metaData;
 
     await card.save();
 
@@ -97,6 +107,7 @@ export const updateCard = async (req, res) => {
     });
   }
 };
+
 
 export const moveCard = async (req, res) => {
   const { cardId } = req.params;

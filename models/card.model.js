@@ -24,8 +24,6 @@ const cardSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
-
-    // ⭐ IMPORTANT FOR ORDERING
     position: {
       type: Number,
       required: true,

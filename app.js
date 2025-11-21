@@ -4,6 +4,8 @@ import cors from "cors";
 import authRoutes from "./routes/auth.route.js";
 import boardRoutes from "./routes/board.route.js";
 import listRoutes from "./routes/list.route.js";
+import cardRoutes from "./routes/card.route.js";
+import recsRoutes from "./routes/recs.route.js";
 
 const app = express();
 
@@ -17,5 +19,7 @@ app.get("/", (req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/board", boardRoutes);
 app.use("/api/list", listRoutes);
+app.use("/api/card", cardRoutes);
+app.use("/api/recommendations", recsRoutes);
 
 export default app;
